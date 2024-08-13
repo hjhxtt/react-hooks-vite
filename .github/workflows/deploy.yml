@@ -10,46 +10,26 @@ on:
 
 jobs:
   build:
-    name: Build on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node_version: [13.14.0]    
+    runs-on: ubuntu-latest  # 在最新的 Ubuntu 环境中运行
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2  # 从 GitHub 仓库中检出代码
 
-      - name: Checkout theme repo
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ env.THEME_REPO }}
-          ref: ${{ env.THEME_BRANCH }}
-          path: themes/next            
+    - name: Set up Node.js
+      uses: actions/setup-node@v2  # 设置 Node.js 环境
+      with:
+        node-version: '20'  # 指定 Node.js 版本
 
-      - name: Configuration environment
-        env:
-          HEXO_DEPLOY_PRI: ${{secrets.HEXO_DEPLOY_PRI}}
-        run: |
-          sudo timedatectl set-timezone "Asia/Shanghai"
-          mkdir -p ~/.ssh/                              
-          echo "$HEXO_DEPLOY_PRI" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git config --global user.name $GIT_USER
-          git config --global user.email $GIT_EMAIL 
+    - name: Install dependencies
+      run: yarn  # 安装项目依赖
 
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-          cache: 'npm'
+    - name: Build project
+      run: yarn build:prd  # 构建项目
 
-      - name: Install Dependencies
-        run: |
-          npm ci           
-
-      - name: Deploy hexo
-        run: |
-          npm run deploy
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'  # 仅当推送到 main 分支时才进行部署
+      uses: peaceiris/actions-gh-pages@v3  # 使用 GitHub Actions 社区的 gh-pages 部署工具
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHub 提供的密钥，用于推送代码到 gh-pages 分支
+        publish_dir: ./dist  # 指定构建输出的目录
