@@ -22,10 +22,10 @@ jobs:
         node-version: '16'  # 指定 Node.js 版本
 
     - name: Install dependencies
-      run: npm install  # 安装项目依赖
+      run: yarn  # 安装项目依赖
 
     - name: Build project
-      run: npm run build:prd  # 构建项目
+      run: yarn build:prd  # 构建项目
 
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'  # 仅当推送到 main 分支时才进行部署
