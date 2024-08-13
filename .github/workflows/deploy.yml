@@ -1,4 +1,4 @@
-name: Frontend CI/CD
+name: Frontend CI/CD  # 工作流的名称
 
 on:
   push:
@@ -6,30 +6,30 @@ on:
       - main  # 当推送到主分支时触发
   pull_request:
     branches:
-      - main  # 当对主分支发起 PR 时触发
+      - main  # 当对主分支发起 Pull Request 时触发
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 在最新的 Ubuntu 环境中运行
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2  # 从 GitHub 仓库中检出代码
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v2  # 设置 Node.js 环境
       with:
-        node-version: '16'
+        node-version: '16'  # 指定 Node.js 版本
 
     - name: Install dependencies
-      run: npm install
+      run: npm install  # 安装项目依赖
 
     - name: Build project
-      run: npm run build
+      run: npm run build:prd  # 构建项目
 
     - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'  # 仅当推送到 main 分支时才进行部署
+      uses: peaceiris/actions-gh-pages@v3  # 使用 GitHub Actions 社区的 gh-pages 部署工具
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHub 提供的密钥，用于推送代码到 gh-pages 分支
+        publish_dir: ./dist  # 指定构建输出的目录
